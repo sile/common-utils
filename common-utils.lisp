@@ -267,8 +267,8 @@
   (defun find-max (key-fn seq) (find-xxx > key-fn seq)))
 
 (defmacro defconst-once-only (name value &optional documentation)
-  `(unless (boundp ',name)
-     (defconstant ,name ,value ,documentation)))
+  `(defconstant ,name (if (boundp ',name) (symbol-value ',name) ,value)
+                      ,@(when documentation (list documentation))))
 
 (defmacro set-package-nickname (package nickname)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
