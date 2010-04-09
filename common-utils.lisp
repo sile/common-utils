@@ -23,7 +23,8 @@
 	   :set-package-nickname
 	   :delete-package-nickname
 	   :s
-	   :split-by-chars))
+	   :split-by-chars
+	   :maphash-to-list))
 (in-package :common-utils)
 
 (deftype octet () '(unsigned-byte 8))
@@ -277,3 +278,18 @@
 (defmacro delete-package-nickname (package)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (rename-package ,package ,package)))
+
+(defun maphash-to-list (function-designator hash-table &aux acc)
+  (declare (optimize (safety 1))
+           (hash-table hash-table)
+           ((or symbol function) function-designator))
+  (locally
+   (declare (optimize (speed 3) (debug 0) (safety 0)))
+   (let ((fn (if (typep function-designator 'function)
+                 function-designator
+               (symbol-function function-designator))))
+     (maphash 
+      (lambda (k v)
+        (push (funcall fn k v) acc))
+      hash-table))
+   acc))
