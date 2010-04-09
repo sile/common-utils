@@ -280,15 +280,15 @@
      (rename-package ,package ,package)))
 
 (defun maphash-to-list (function-designator hash-table &aux acc)
-  (declare (optimize (safety 1))
+  (declare (optimize (safety 1) (debug 1) (speed 3))
            (hash-table hash-table)
            ((or symbol function) function-designator))
   (locally
-   (declare (optimize (speed 3) (debug 0) (safety 0)))
+   (declare (optimize (debug 0) (safety 0)))
    (let ((fn (if (typep function-designator 'function)
                  function-designator
                (symbol-function function-designator))))
-     (maphash 
+     (maphash
       (lambda (k v)
         (push (funcall fn k v) acc))
       hash-table))
