@@ -18,6 +18,7 @@
 	   :find-max
 	   :read-file
 	   :read-binary-file
+           :read-lines
 	   :install-readmacro :uninstall-readmacro
 	   :defconst-once-only
 	   :set-package-nickname
@@ -293,3 +294,9 @@
         (push (funcall fn k v) acc))
       hash-table))
    acc))
+
+(defun read-lines (filepath)
+  (let ((lines '()))
+    (each-file-line (line filepath)
+       (push line lines))
+    (nreverse lines)))
