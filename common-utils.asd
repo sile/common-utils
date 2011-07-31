@@ -1,6 +1,6 @@
 (defsystem common-utils
   :name "common-utils"
-  :version "0.0.15"
+  :version "0.0.16"
   :maintainer "Takeru Ohta"
   :description "Common utilities"
   

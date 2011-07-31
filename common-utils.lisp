@@ -25,7 +25,8 @@
 	   :delete-package-nickname
 	   :s
 	   :split-by-chars
-	   :maphash-to-list))
+	   :maphash-to-list
+           :load-local-system))
 (in-package :common-utils)
 
 (deftype octet () '(unsigned-byte 8))
@@ -300,3 +301,10 @@
     (each-file-line (line filepath)
        (push line lines))
     (nreverse lines)))
+
+(defun load-local-system (package &optional (package-directory #P"./"))
+  (let #.`((asdf:*central-registry* (directory package-directory))
+           ;; or #+ASDF2
+           ,@(when #.#1=(find-symbol "*DEFAULT-SOURCE-REGISTRIES*" :asdf)
+                   `((,#1# nil))))
+       (asdf:load-system package)))
