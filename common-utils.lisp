@@ -26,7 +26,10 @@
 	   :s
 	   :split-by-chars
 	   :maphash-to-list
-           :load-local-system))
+           :load-local-system
+            
+           #+SBCL
+           :c-inspect))
 (in-package :common-utils)
 
 (deftype octet () '(unsigned-byte 8))
@@ -308,3 +311,28 @@
            ,@(when #.#1=(find-symbol "*DEFAULT-SOURCE-REGISTRIES*" :asdf)
                    `((,#1# nil))))
        (asdf:load-system package)))
+
+#+SBCL
+(defun c-inspect (&key include type value)
+  (flet ((gen-source ()
+           (with-output-to-string (out)
+             (format out "~&#include <iostream>~%")
+             (dolist (inc include)
+               (format out "~&#include <~a>~%" inc))
+
+             (format out "~%int main() {~%")
+             (dolist (ty type)
+               (format out "  std::cout << \"sizeof(~a) = \" << sizeof(~a) << std::endl;~%" ty ty))
+
+             (dolist (val value)
+               (format out "  std::cout << \"~a = \" << ~a << std::endl;~%" val val))
+             
+             (format out "}~%"))))
+    (with-input-from-string (in (gen-source))
+      (let ((ret (sb-ext:run-program "g++" `("-x" "c++" "-" "-o" "/tmp/c.inspect.tmp")
+                                     :search t :input in :output t)))
+        (when (zerop (sb-ext:process-exit-code ret))
+          (sb-ext:run-program "/tmp/c.inspect.tmp" '() :output t)))))
+  (values))
+
+
