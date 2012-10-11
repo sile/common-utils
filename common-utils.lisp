@@ -33,11 +33,11 @@
 (in-package :common-utils)
 
 (deftype octet () '(unsigned-byte 8))
-(deftype octets (&optional size) 
+(deftype octets (&optional (size nil))
   (if size
-      `(vector octets ,size)
+      `(vector octet ,size)
     '(vector octet)))
-(deftype simple-octets (&optional size) 
+(deftype simple-octets (&optional (size nil))
   (if size
       `(simple-array octet (,size))
     '(simple-array octet)))
